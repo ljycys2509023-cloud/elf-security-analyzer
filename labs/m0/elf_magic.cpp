@@ -36,14 +36,12 @@ int main(int argc, char* argv[])
 
     cout << dec << '\n';
 
-    // 先检查是否读满了 4 个字节
     if (count < 4)
     {
         cout << "ELF magic: too short (" << count << " bytes)\n";
         return 1;
     }
 
-    // 逐个比较魔数
     bool match = true;
 
     for (int i = 0; i < 4; i++)
