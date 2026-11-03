@@ -1,0 +1,15 @@
+# Compiled lab programs
+labs/m0/hello
+labs/m0/elf_magic
+
+# Build output (future CMake builds)
+build/
+*.o
+*.out
+
+# Editor and OS files
+.vs/
+.vscode/
+*.swp
+Thumbs.db
+desktop.ini
