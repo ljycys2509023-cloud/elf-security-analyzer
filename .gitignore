@@ -1,6 +1,7 @@
 # Compiled lab programs
 labs/m0/hello
 labs/m0/elf_magic
+labs/m1/elf_header
 
 # Build output (future CMake builds)
 build/
