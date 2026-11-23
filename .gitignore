@@ -2,9 +2,11 @@
 labs/m0/hello
 labs/m0/elf_magic
 labs/m1/elf_header
+/elf-analyzer
 
 # Build output (future CMake builds)
 build/
+build-sanitize/
 *.o
 *.out
 
@@ -14,3 +16,7 @@ build/
 *.swp
 Thumbs.db
 desktop.ini
+
+# Python cache
+__pycache__/
+*.pyc
