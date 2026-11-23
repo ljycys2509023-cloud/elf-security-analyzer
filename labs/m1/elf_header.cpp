@@ -108,10 +108,108 @@ int main(int argc, char *argv[])
     if (match)
     {
         cout << "ELF magic: match\n";
-        cout << "e_type    = " << read_u16(buf + 16) << '\n';
-        cout << "e_machine = " << read_u16(buf + 18) << '\n';
-        cout << "e_version = " << read_u32(buf + 20) << '\n';
-        cout << "e_entry   = 0x" << hex << read_u64(buf + 24) << dec << '\n';
+        Elf64Header hdr{};
+        for (int i = 0; i < 16; i++)
+        {
+            hdr.e_ident[i] = buf[i];
+        }
+        if (hdr.e_ident[4] == 1)
+        {
+            cerr << "unsupported: ELF32 is not supported\n";
+            return 1;
+        }
+        if(hdr.e_ident[4] !=1 && hdr.e_ident[4] != 2)
+        {
+            cerr <<"invalid: unknown ELF class\n";
+            return 1;
+        }
+
+        if(hdr.e_ident[5] == 2)
+        {
+            cerr <<"unsupported: big-endian ELF is not supported\n";
+            return 1;
+        }
+        if(hdr.e_ident[5] !=1 && hdr.e_ident[5] !=2)
+        {
+            cerr <<"invalid: unknown ELF endian\n";
+            return 1;
+        }
+
+        if(hdr.e_ident[6] != 1)
+        {
+            cerr << "invalid: unsupported ELF identification version\n";
+            return 1;
+        }
+
+        hdr.e_type = read_u16(buf + 16);
+        hdr.e_machine = read_u16(buf + 18);
+        hdr.e_version = read_u32(buf + 20);
+        if(hdr.e_version != 1)
+        {
+            cerr<< " invalid: unexpected ELF header version\n";
+            return 1;
+        }
+        hdr.e_entry = read_u64(buf + 24);
+        hdr.e_phoff = read_u64(buf + 32);
+        hdr.e_shoff = read_u64(buf + 40);
+        hdr.e_flags = read_u32(buf + 48);
+        hdr.e_ehsize = read_u16(buf + 52);
+        if(hdr.e_ehsize != 64)
+        {
+            cerr << "invalid: unexpected ELF64 header size\n";
+            return 1;
+        }
+        hdr.e_phentsize = read_u16(buf + 54);
+        hdr.e_phnum = read_u16(buf + 56);
+        hdr.e_shentsize = read_u16(buf + 58);
+        hdr.e_shnum = read_u16(buf + 60);
+        hdr.e_shstrndx = read_u16(buf + 62);
+        
+        cout << "\nELF Header:\n";
+        cout << "Class: ELF64\n";
+        cout << "Data: Little endian\n";
+        cout << "e_type      = " << hdr.e_type << '\n';
+        if(hdr.e_type == 3)
+        {
+            cout << "Type: DYN (3)\n";
+        }
+        else if(hdr.e_type == 2)
+        {
+            cout << "Type: EXEC (2)\n";
+        }
+        else if(hdr.e_type == 1)
+        {
+            cout << "Type: REL (1)\n";
+        }
+        else
+        {
+            cout << "Type: OTHER\n";
+        }
+        cout << "e_machine   = " << hdr.e_machine << '\n';
+        if(hdr.e_machine == 62)
+        {
+            cout << "Machine: AMD x86-64 (62)\n";
+        }
+        else if(hdr.e_machine == 183)
+        {
+            cout << "Machine: AArch64 (183)\n";
+        }
+        else
+        {
+            cout<< "Machine: OTHER\n";
+        }
+        cout << "e_version   = " << hdr.e_version << '\n';
+        cout << "e_entry     = 0x" << hex << hdr.e_entry << dec << '\n';
+        cout << "e_phoff     = "<< hdr.e_phoff <<'\n';
+        cout << "e_shoff     = "<< hdr.e_shoff <<'\n';
+        cout << "e_flags     = "<< hdr.e_flags <<'\n';
+        cout << "e_ehsize    = "<< hdr.e_ehsize <<'\n';
+        cout << "e_phentsize = "<< hdr.e_phentsize <<'\n';
+        cout << "e_phnum     = "<< hdr.e_phnum <<'\n';
+        cout << "e_shentsize = "<< hdr.e_shentsize <<'\n';
+        cout << "e_shnum     = "<< hdr.e_shnum <<'\n';
+        cout << "e_shstrndx  = "<< hdr.e_shstrndx <<'\n';
+        
         return 0;
     }
     else
