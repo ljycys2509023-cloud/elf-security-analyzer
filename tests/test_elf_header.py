@@ -62,3 +62,60 @@ class ElfHeaderTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn("too short", result.stderr)
             self.assertNotIn("ELF Header:", result.stdout)
+
+    def test_missing_file(self):
+        result = subprocess.run(
+            [str(ANALYZER), "does_not_exist.bin"],
+            capture_output=True,
+            text=True
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("cannot open", result.stderr)
+
+    def test_no_arguments(self):
+        result = subprocess.run(
+            [str(ANALYZER)],
+            capture_output=True,
+            text=True
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("usage", result.stderr)
+
+    def test_directory_input(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = subprocess.run(
+                [str(ANALYZER), tmpdir],
+                capture_output=True,
+                text=True
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("cannot read", result.stderr)
+
+    def test_63_byte_header(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            test_file = Path(tmpdir) / "short63.bin"
+            test_file.write_bytes(ANALYZER.read_bytes()[:63])
+
+            result = subprocess.run(
+                [str(ANALYZER), str(test_file)],
+                capture_output=True,
+                text=True
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("too short (63 bytes)", result.stderr)
+
+
+
+    def test_magic_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            test_file = Path(tmpdir) / "not_elf.bin"
+            test_file.write_bytes(b"A" * 64)
+
+            result = subprocess.run(
+                [str(ANALYZER), str(test_file)],
+                capture_output=True,
+                text=True
+            )
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("mismatch", result.stderr)
