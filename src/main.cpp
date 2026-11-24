@@ -30,6 +30,12 @@ int main(int argc, char *argv[])
 
     streamsize count = f.gcount();
 
+    if (f.bad())
+    {
+        cerr << "error: cannot read " << argv[1] << '\n';
+        return 2;
+    }
+
     cout << "read " << count << " bytes :";
 
     for (int i = 0; i < count; i++)
