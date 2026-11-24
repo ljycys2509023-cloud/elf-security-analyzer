@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        cerr << "usage: elf_header <file>" << '\n';
+        cerr << "usage: elf-analyzer <file>" << '\n';
         return 2;
     }
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
     if (count < 64)
     {
-        cout << "ELF header: too short (" << count << " bytes)\n";
+        cerr << "ELF header: too short (" << count << " bytes)\n";
         return 1;
     }
 
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
         
         if(hdr.e_version != 1)
         {
-            cerr<< " invalid: unexpected ELF header version\n";
+            cerr<< "invalid: unexpected ELF header version\n";
             return 1;
         }
         
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cout << "ELF magic: mismatch\n";
+        cerr << "ELF magic: mismatch\n";
         return 1;
     }
 }
