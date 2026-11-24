@@ -59,5 +59,6 @@ class ElfHeaderTests(unittest.TestCase):
                 text=True
             )
 
-            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("too short", result.stderr)
             self.assertNotIn("ELF Header:", result.stdout)
